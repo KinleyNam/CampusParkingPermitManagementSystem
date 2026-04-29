@@ -23,10 +23,6 @@ General:
     SendBufferSize: 10
     ClientCertificate: /var/hyperledger/tls/server.crt
     ClientPrivateKey: /var/hyperledger/tls/server.key
-    ListenPort: 7050
-    ListenAddress: 0.0.0.0
-    ServerCertificate: /var/hyperledger/tls/server.crt
-    ServerPrivateKey: /var/hyperledger/tls/server.key
   BootstrapMethod: file
   BootstrapFile: /var/hyperledger/config/genesis.block
   LocalMSPDir: /var/hyperledger/msp

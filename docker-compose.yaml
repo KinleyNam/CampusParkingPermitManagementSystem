@@ -1,0 +1,394 @@
+################################################################################
+# docker-compose.yaml
+# Campus Parking Management System - Hyperledger Fabric Network
+# Containers: 3 Raft orderers + 8 peers (2 per org)
+################################################################################
+
+version: "3.8"
+
+networks:
+  campus-nets:
+    external: true
+
+volumes:
+  orderer0-data:
+    external: true
+  orderer1-data:
+    external: true
+  orderer2-data:
+    external: true
+  peer0-admin-data:
+    external: true
+  peer1-admin-data:
+    external: true
+  peer0-finance-data:
+    external: true
+  peer1-finance-data:
+    external: true
+  peer0-security-data:
+    external: true
+  peer1-security-data:
+    external: true
+  peer0-studentaffairs-data:
+    external: true
+  peer1-studentaffairs-data:
+    external: true
+
+services:
+
+  ##############################################################################
+  # ORDERER NODES (Raft consensus - 3 nodes for fault tolerance)
+  ##############################################################################
+
+  orderer0.university.com:
+    image: hyperledger/fabric-orderer:latest
+    container_name: orderer0.university.com
+    environment:
+      - FABRIC_LOGGING_SPEC=INFO
+      - ORDERER_GENERAL_LISTENADDRESS=0.0.0.0
+      - ORDERER_GENERAL_LISTENPORT=7050
+      - FABRIC_CFG_PATH=/var/hyperledger/config
+    volumes:
+      - ./config/orderer/orderer.yaml:/var/hyperledger/config/orderer.yaml
+      - ./channel-artifacts/orderer/genesis.block:/var/hyperledger/config/genesis.block
+      - ./crypto-config/ordererOrganizations/university.com/orderers/orderer0.university.com/msp:/var/hyperledger/msp
+      - ./crypto-config/ordererOrganizations/university.com/orderers/orderer0.university.com/tls:/var/hyperledger/tls
+      - orderer0-data:/var/ledger
+    ports:
+      - "7050:7050"
+      - "8443:8443"
+    networks:
+      campus-nets:
+        aliases:
+          - orderer0.university.com
+    command: orderer
+
+  orderer1.university.com:
+    image: hyperledger/fabric-orderer:latest
+    container_name: orderer1.university.com
+    environment:
+      - FABRIC_LOGGING_SPEC=INFO
+      - ORDERER_GENERAL_LISTENADDRESS=0.0.0.0
+      - ORDERER_GENERAL_LISTENPORT=7050
+      - FABRIC_CFG_PATH=/var/hyperledger/config
+    volumes:
+      - ./config/orderer/orderer.yaml:/var/hyperledger/config/orderer.yaml
+      - ./channel-artifacts/orderer/genesis.block:/var/hyperledger/config/genesis.block
+      - ./crypto-config/ordererOrganizations/university.com/orderers/orderer1.university.com/msp:/var/hyperledger/msp
+      - ./crypto-config/ordererOrganizations/university.com/orderers/orderer1.university.com/tls:/var/hyperledger/tls
+      - orderer1-data:/var/ledger
+    ports:
+      - "7060:7050"
+      - "8444:8443"
+    networks:
+      campus-nets:
+        aliases:
+          - orderer1.university.com
+    command: orderer
+    depends_on:
+      - orderer0.university.com
+
+  orderer2.university.com:
+    image: hyperledger/fabric-orderer:latest
+    container_name: orderer2.university.com
+    environment:
+      - FABRIC_LOGGING_SPEC=INFO
+      - ORDERER_GENERAL_LISTENADDRESS=0.0.0.0
+      - ORDERER_GENERAL_LISTENPORT=7050
+      - FABRIC_CFG_PATH=/var/hyperledger/config
+    volumes:
+      - ./config/orderer/orderer.yaml:/var/hyperledger/config/orderer.yaml
+      - ./channel-artifacts/orderer/genesis.block:/var/hyperledger/config/genesis.block
+      - ./crypto-config/ordererOrganizations/university.com/orderers/orderer2.university.com/msp:/var/hyperledger/msp
+      - ./crypto-config/ordererOrganizations/university.com/orderers/orderer2.university.com/tls:/var/hyperledger/tls
+      - orderer2-data:/var/ledger
+    ports:
+      - "7070:7050"
+      - "8445:8443"
+    networks:
+      campus-nets:
+        aliases:
+          - orderer2.university.com
+    command: orderer
+    depends_on:
+      - orderer0.university.com
+
+  ##############################################################################
+  # UNIVERSITY ADMIN ORG PEERS (permit issuance and management)
+  ##############################################################################
+
+  peer0.admin.university.com:
+    image: hyperledger/fabric-peer:latest
+    container_name: peer0.admin.university.com
+    environment:
+      - FABRIC_LOGGING_SPEC=INFO
+      - FABRIC_CFG_PATH=/var/hyperledger/config
+      - CORE_PEER_LOCALMSPID=UniversityAdminMSP
+      - CORE_PEER_ID=peer0.admin.university.com
+      - CORE_PEER_ADDRESS=peer0.admin.university.com:7051
+      - CORE_PEER_LISTENADDRESS=0.0.0.0:7051
+      - CORE_PEER_CHAINCODEADDRESS=peer0.admin.university.com:7052
+      - CORE_PEER_CHAINCODELISTENADDRESS=0.0.0.0:7052
+      - CORE_PEER_GOSSIP_BOOTSTRAP=peer1.admin.university.com:7051
+      - CORE_PEER_GOSSIP_EXTERNALENDPOINT=peer0.admin.university.com:7051
+      - CORE_VM_ENDPOINT=unix:///var/run/docker.sock
+      - CORE_VM_DOCKER_HOSTCONFIG_NETWORKMODE=campus-nets
+    volumes:
+      - ./config/admin/core.yaml:/var/hyperledger/config/core.yaml
+      - ./crypto-config/peerOrganizations/admin.university.com/peers/peer0.admin.university.com/msp:/var/hyperledger/msp
+      - ./crypto-config/peerOrganizations/admin.university.com/peers/peer0.admin.university.com/tls:/var/hyperledger/tls
+      - /var/run/docker.sock:/var/run/docker.sock
+      - peer0-admin-data:/var/hyperledger/production
+    ports:
+      - "7051:7051"
+      - "7052:7052"
+    networks:
+      campus-nets:
+        aliases:
+          - peer0.admin.university.com
+    command: peer node start
+    depends_on:
+      - orderer0.university.com
+
+  peer1.admin.university.com:
+    image: hyperledger/fabric-peer:latest
+    container_name: peer1.admin.university.com
+    environment:
+      - FABRIC_LOGGING_SPEC=INFO
+      - FABRIC_CFG_PATH=/var/hyperledger/config
+      - CORE_PEER_LOCALMSPID=UniversityAdminMSP
+      - CORE_PEER_ID=peer1.admin.university.com
+      - CORE_PEER_ADDRESS=peer1.admin.university.com:7051
+      - CORE_PEER_LISTENADDRESS=0.0.0.0:7051
+      - CORE_PEER_CHAINCODEADDRESS=peer1.admin.university.com:7052
+      - CORE_PEER_CHAINCODELISTENADDRESS=0.0.0.0:7052
+      - CORE_PEER_GOSSIP_BOOTSTRAP=peer0.admin.university.com:7051
+      - CORE_PEER_GOSSIP_EXTERNALENDPOINT=peer1.admin.university.com:7051
+      - CORE_VM_ENDPOINT=unix:///var/run/docker.sock
+      - CORE_VM_DOCKER_HOSTCONFIG_NETWORKMODE=campus-nets
+    volumes:
+      - ./config/admin/core.yaml:/var/hyperledger/config/core.yaml
+      - ./crypto-config/peerOrganizations/admin.university.com/peers/peer1.admin.university.com/msp:/var/hyperledger/msp
+      - ./crypto-config/peerOrganizations/admin.university.com/peers/peer1.admin.university.com/tls:/var/hyperledger/tls
+      - /var/run/docker.sock:/var/run/docker.sock
+      - peer1-admin-data:/var/hyperledger/production
+    ports:
+      - "7055:7051"
+      - "7056:7052"
+    networks:
+      campus-nets:
+        aliases:
+          - peer1.admin.university.com
+    command: peer node start
+    depends_on:
+      - orderer0.university.com
+
+  ##############################################################################
+  # FINANCE ORG PEERS (fee payments and financial verification)
+  ##############################################################################
+
+  peer0.finance.university.com:
+    image: hyperledger/fabric-peer:latest
+    container_name: peer0.finance.university.com
+    environment:
+      - FABRIC_LOGGING_SPEC=INFO
+      - FABRIC_CFG_PATH=/var/hyperledger/config
+      - CORE_PEER_LOCALMSPID=FinanceMSP
+      - CORE_PEER_ID=peer0.finance.university.com
+      - CORE_PEER_ADDRESS=peer0.finance.university.com:8051
+      - CORE_PEER_LISTENADDRESS=0.0.0.0:8051
+      - CORE_PEER_CHAINCODEADDRESS=peer0.finance.university.com:8052
+      - CORE_PEER_CHAINCODELISTENADDRESS=0.0.0.0:8052
+      - CORE_PEER_GOSSIP_BOOTSTRAP=peer1.finance.university.com:8051
+      - CORE_PEER_GOSSIP_EXTERNALENDPOINT=peer0.finance.university.com:8051
+      - CORE_VM_ENDPOINT=unix:///var/run/docker.sock
+      - CORE_VM_DOCKER_HOSTCONFIG_NETWORKMODE=campus-nets
+    volumes:
+      - ./config/finance/core.yaml:/var/hyperledger/config/core.yaml
+      - ./crypto-config/peerOrganizations/finance.university.com/peers/peer0.finance.university.com/msp:/var/hyperledger/msp
+      - ./crypto-config/peerOrganizations/finance.university.com/peers/peer0.finance.university.com/tls:/var/hyperledger/tls
+      - /var/run/docker.sock:/var/run/docker.sock
+      - peer0-finance-data:/var/hyperledger/production
+    ports:
+      - "8051:8051"
+      - "8052:8052"
+    networks:
+      campus-nets:
+        aliases:
+          - peer0.finance.university.com
+    command: peer node start
+    depends_on:
+      - orderer0.university.com
+
+  peer1.finance.university.com:
+    image: hyperledger/fabric-peer:latest
+    container_name: peer1.finance.university.com
+    environment:
+      - FABRIC_LOGGING_SPEC=INFO
+      - FABRIC_CFG_PATH=/var/hyperledger/config
+      - CORE_PEER_LOCALMSPID=FinanceMSP
+      - CORE_PEER_ID=peer1.finance.university.com
+      - CORE_PEER_ADDRESS=peer1.finance.university.com:8051
+      - CORE_PEER_LISTENADDRESS=0.0.0.0:8051
+      - CORE_PEER_CHAINCODEADDRESS=peer1.finance.university.com:8052
+      - CORE_PEER_CHAINCODELISTENADDRESS=0.0.0.0:8052
+      - CORE_PEER_GOSSIP_BOOTSTRAP=peer0.finance.university.com:8051
+      - CORE_PEER_GOSSIP_EXTERNALENDPOINT=peer1.finance.university.com:8051
+      - CORE_VM_ENDPOINT=unix:///var/run/docker.sock
+      - CORE_VM_DOCKER_HOSTCONFIG_NETWORKMODE=campus-nets
+    volumes:
+      - ./config/finance/core.yaml:/var/hyperledger/config/core.yaml
+      - ./crypto-config/peerOrganizations/finance.university.com/peers/peer1.finance.university.com/msp:/var/hyperledger/msp
+      - ./crypto-config/peerOrganizations/finance.university.com/peers/peer1.finance.university.com/tls:/var/hyperledger/tls
+      - /var/run/docker.sock:/var/run/docker.sock
+      - peer1-finance-data:/var/hyperledger/production
+    ports:
+      - "8055:8051"
+      - "8056:8052"
+    networks:
+      campus-nets:
+        aliases:
+          - peer1.finance.university.com
+    command: peer node start
+    depends_on:
+      - orderer0.university.com
+
+  ##############################################################################
+  # SECURITY ORG PEERS (gate verification and violations)
+  ##############################################################################
+
+  peer0.security.university.com:
+    image: hyperledger/fabric-peer:latest
+    container_name: peer0.security.university.com
+    environment:
+      - FABRIC_LOGGING_SPEC=INFO
+      - FABRIC_CFG_PATH=/var/hyperledger/config
+      - CORE_PEER_LOCALMSPID=SecurityMSP
+      - CORE_PEER_ID=peer0.security.university.com
+      - CORE_PEER_ADDRESS=peer0.security.university.com:9051
+      - CORE_PEER_LISTENADDRESS=0.0.0.0:9051
+      - CORE_PEER_CHAINCODEADDRESS=peer0.security.university.com:9052
+      - CORE_PEER_CHAINCODELISTENADDRESS=0.0.0.0:9052
+      - CORE_PEER_GOSSIP_BOOTSTRAP=peer1.security.university.com:9051
+      - CORE_PEER_GOSSIP_EXTERNALENDPOINT=peer0.security.university.com:9051
+      - CORE_VM_ENDPOINT=unix:///var/run/docker.sock
+      - CORE_VM_DOCKER_HOSTCONFIG_NETWORKMODE=campus-nets
+    volumes:
+      - ./config/security/core.yaml:/var/hyperledger/config/core.yaml
+      - ./crypto-config/peerOrganizations/security.university.com/peers/peer0.security.university.com/msp:/var/hyperledger/msp
+      - ./crypto-config/peerOrganizations/security.university.com/peers/peer0.security.university.com/tls:/var/hyperledger/tls
+      - /var/run/docker.sock:/var/run/docker.sock
+      - peer0-security-data:/var/hyperledger/production
+    ports:
+      - "9051:9051"
+      - "9052:9052"
+    networks:
+      campus-nets:
+        aliases:
+          - peer0.security.university.com
+    command: peer node start
+    depends_on:
+      - orderer0.university.com
+
+  peer1.security.university.com:
+    image: hyperledger/fabric-peer:latest
+    container_name: peer1.security.university.com
+    environment:
+      - FABRIC_LOGGING_SPEC=INFO
+      - FABRIC_CFG_PATH=/var/hyperledger/config
+      - CORE_PEER_LOCALMSPID=SecurityMSP
+      - CORE_PEER_ID=peer1.security.university.com
+      - CORE_PEER_ADDRESS=peer1.security.university.com:9051
+      - CORE_PEER_LISTENADDRESS=0.0.0.0:9051
+      - CORE_PEER_CHAINCODEADDRESS=peer1.security.university.com:9052
+      - CORE_PEER_CHAINCODELISTENADDRESS=0.0.0.0:9052
+      - CORE_PEER_GOSSIP_BOOTSTRAP=peer0.security.university.com:9051
+      - CORE_PEER_GOSSIP_EXTERNALENDPOINT=peer1.security.university.com:9051
+      - CORE_VM_ENDPOINT=unix:///var/run/docker.sock
+      - CORE_VM_DOCKER_HOSTCONFIG_NETWORKMODE=campus-nets
+    volumes:
+      - ./config/security/core.yaml:/var/hyperledger/config/core.yaml
+      - ./crypto-config/peerOrganizations/security.university.com/peers/peer1.security.university.com/msp:/var/hyperledger/msp
+      - ./crypto-config/peerOrganizations/security.university.com/peers/peer1.security.university.com/tls:/var/hyperledger/tls
+      - /var/run/docker.sock:/var/run/docker.sock
+      - peer1-security-data:/var/hyperledger/production
+    ports:
+      - "9055:9051"
+      - "9056:9052"
+    networks:
+      campus-nets:
+        aliases:
+          - peer1.security.university.com
+    command: peer node start
+    depends_on:
+      - orderer0.university.com
+
+  ##############################################################################
+  # STUDENT AFFAIRS ORG PEERS (eligibility management)
+  ##############################################################################
+
+  peer0.studentaffairs.university.com:
+    image: hyperledger/fabric-peer:latest
+    container_name: peer0.studentaffairs.university.com
+    environment:
+      - FABRIC_LOGGING_SPEC=INFO
+      - FABRIC_CFG_PATH=/var/hyperledger/config
+      - CORE_PEER_LOCALMSPID=StudentAffairsMSP
+      - CORE_PEER_ID=peer0.studentaffairs.university.com
+      - CORE_PEER_ADDRESS=peer0.studentaffairs.university.com:10051
+      - CORE_PEER_LISTENADDRESS=0.0.0.0:10051
+      - CORE_PEER_CHAINCODEADDRESS=peer0.studentaffairs.university.com:10052
+      - CORE_PEER_CHAINCODELISTENADDRESS=0.0.0.0:10052
+      - CORE_PEER_GOSSIP_BOOTSTRAP=peer1.studentaffairs.university.com:10051
+      - CORE_PEER_GOSSIP_EXTERNALENDPOINT=peer0.studentaffairs.university.com:10051
+      - CORE_VM_ENDPOINT=unix:///var/run/docker.sock
+      - CORE_VM_DOCKER_HOSTCONFIG_NETWORKMODE=campus-nets
+    volumes:
+      - ./config/studentaffairs/core.yaml:/var/hyperledger/config/core.yaml
+      - ./crypto-config/peerOrganizations/studentaffairs.university.com/peers/peer0.studentaffairs.university.com/msp:/var/hyperledger/msp
+      - ./crypto-config/peerOrganizations/studentaffairs.university.com/peers/peer0.studentaffairs.university.com/tls:/var/hyperledger/tls
+      - /var/run/docker.sock:/var/run/docker.sock
+      - peer0-studentaffairs-data:/var/hyperledger/production
+    ports:
+      - "10051:10051"
+      - "10052:10052"
+    networks:
+      campus-nets:
+        aliases:
+          - peer0.studentaffairs.university.com
+    command: peer node start
+    depends_on:
+      - orderer0.university.com
+
+  peer1.studentaffairs.university.com:
+    image: hyperledger/fabric-peer:latest
+    container_name: peer1.studentaffairs.university.com
+    environment:
+      - FABRIC_LOGGING_SPEC=INFO
+      - FABRIC_CFG_PATH=/var/hyperledger/config
+      - CORE_PEER_LOCALMSPID=StudentAffairsMSP
+      - CORE_PEER_ID=peer1.studentaffairs.university.com
+      - CORE_PEER_ADDRESS=peer1.studentaffairs.university.com:10051
+      - CORE_PEER_LISTENADDRESS=0.0.0.0:10051
+      - CORE_PEER_CHAINCODEADDRESS=peer1.studentaffairs.university.com:10052
+      - CORE_PEER_CHAINCODELISTENADDRESS=0.0.0.0:10052
+      - CORE_PEER_GOSSIP_BOOTSTRAP=peer0.studentaffairs.university.com:10051
+      - CORE_PEER_GOSSIP_EXTERNALENDPOINT=peer1.studentaffairs.university.com:10051
+      - CORE_VM_ENDPOINT=unix:///var/run/docker.sock
+      - CORE_VM_DOCKER_HOSTCONFIG_NETWORKMODE=campus-nets
+    volumes:
+      - ./config/studentaffairs/core.yaml:/var/hyperledger/config/core.yaml
+      - ./crypto-config/peerOrganizations/studentaffairs.university.com/peers/peer1.studentaffairs.university.com/msp:/var/hyperledger/msp
+      - ./crypto-config/peerOrganizations/studentaffairs.university.com/peers/peer1.studentaffairs.university.com/tls:/var/hyperledger/tls
+      - /var/run/docker.sock:/var/run/docker.sock
+      - peer1-studentaffairs-data:/var/hyperledger/production
+    ports:
+      - "10055:10051"
+      - "10056:10052"
+    networks:
+      campus-nets:
+        aliases:
+          - peer1.studentaffairs.university.com
+    command: peer node start
+    depends_on:
+      - orderer0.university.com

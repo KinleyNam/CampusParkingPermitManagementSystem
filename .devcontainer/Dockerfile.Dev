@@ -1,0 +1,21 @@
+FROM ubuntu:20.04
+
+ENV DEBIAN_FRONTEND=noninteractive
+
+RUN apt-get update && apt-get install -y \
+    curl \
+    wget \
+    git \
+    jq \
+    vim \
+    && rm -rf /var/lib/apt/lists/*
+
+# Install Hyperledger Fabric binaries
+ENV FABRIC_VERSION=2.5.0
+ENV FABRIC_CA_VERSION=1.5.6
+
+RUN curl -sSL https://bit.ly/2ysbOFE | bash -s -- ${FABRIC_VERSION} ${FABRIC_CA_VERSION} --docker --samples --binary
+
+ENV PATH=$PATH:/root/fabric-samples/bin
+
+WORKDIR /workspaces/CPPMS

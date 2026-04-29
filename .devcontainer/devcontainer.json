@@ -1,0 +1,17 @@
+{
+  "name": "Campus Parking Management System - HLF Dev",
+  "dockerComposeFile": ["docker-compose-cppms.yml"],
+  "service": "development",
+  "workspaceFolder": "/workspaces/CPPMS",
+  "features": {
+    "ghcr.io/devcontainers/features/docker-outside-of-docker:1": {}
+  },
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "redhat.vscode-yaml",
+        "ms-azuretools.vscode-docker"
+      ]
+    }
+  }
+}

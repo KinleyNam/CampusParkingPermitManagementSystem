@@ -1,0 +1,57 @@
+OrdererOrgs:
+  - Name: Orderer
+    Domain: university.com
+    EnableNodeOUs: true
+    Specs:
+      - Hostname: orderer0
+      - Hostname: orderer1
+      - Hostname: orderer2
+
+PeerOrgs:
+  # University Admin Org - manages permit issuance and overall parking management
+  - Name: UniversityAdmin
+    Domain: admin.university.com
+    EnableNodeOUs: true
+    Specs:
+      - Hostname: peer0
+        CommonName: peer0.admin.university.com
+      - Hostname: peer1
+        CommonName: peer1.admin.university.com
+    Users:
+      Count: 1
+
+  # Finance Org - manages fee payments and financial verification
+  - Name: Finance
+    Domain: finance.university.com
+    EnableNodeOUs: true
+    Specs:
+      - Hostname: peer0
+        CommonName: peer0.finance.university.com
+      - Hostname: peer1
+        CommonName: peer1.finance.university.com
+    Users:
+      Count: 1
+
+  # Security Org - manages gate verification and parking violations
+  - Name: Security
+    Domain: security.university.com
+    EnableNodeOUs: true
+    Specs:
+      - Hostname: peer0
+        CommonName: peer0.security.university.com
+      - Hostname: peer1
+        CommonName: peer1.security.university.com
+    Users:
+      Count: 1
+
+  # Student Affairs Org - manages student eligibility for parking permits
+  - Name: StudentAffairs
+    Domain: studentaffairs.university.com
+    EnableNodeOUs: true
+    Specs:
+      - Hostname: peer0
+        CommonName: peer0.studentaffairs.university.com
+      - Hostname: peer1
+        CommonName: peer1.studentaffairs.university.com
+    Users:
+      Count: 1

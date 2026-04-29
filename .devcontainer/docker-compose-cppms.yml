@@ -1,0 +1,45 @@
+version: "3.8"
+
+services:
+  development:
+    build:
+      context: .
+      dockerfile: Dockerfile.Dev
+    image: cppms-devweb:latest
+    container_name: cppms-devweb
+    tty: true
+    stdin_open: true
+    volumes:
+      - ..:/workspaces/CPPMS
+      - /var/run/docker.sock:/var/run/docker.sock
+    networks:
+      - campus-nets
+    working_dir: /workspaces/CPPMS
+
+networks:
+  campus-nets:
+    external: true
+
+volumes:
+  orderer0-data:
+    external: true
+  orderer1-data:
+    external: true
+  orderer2-data:
+    external: true
+  peer0-admin-data:
+    external: true
+  peer1-admin-data:
+    external: true
+  peer0-finance-data:
+    external: true
+  peer1-finance-data:
+    external: true
+  peer0-security-data:
+    external: true
+  peer1-security-data:
+    external: true
+  peer0-studentaffairs-data:
+    external: true
+  peer1-studentaffairs-data:
+    external: true

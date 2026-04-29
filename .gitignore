@@ -1,0 +1,16 @@
+# Generated crypto material - do not commit
+crypto-config/
+
+# Generated channel artifacts (blocks and tx files)
+channel-artifacts/orderer/*.block
+channel-artifacts/parking-main-channel/*.block
+channel-artifacts/parking-main-channel/*.tx
+channel-artifacts/finance-channel/*.block
+channel-artifacts/finance-channel/*.tx
+
+# Docker
+*.log
+
+# OS
+.DS_Store
+Thumbs.db

@@ -1,0 +1,256 @@
+################################################################################
+# configtx.yaml
+# Campus Parking Management System - Hyperledger Fabric
+# Defines channel configuration, organizations, orderer, and profiles
+################################################################################
+
+################################################################################
+# SECTION: Capabilities
+################################################################################
+Capabilities:
+  Channel: &ChannelCapabilities
+    V2_0: true
+  Orderer: &OrdererCapabilities
+    V2_0: true
+  Application: &ApplicationCapabilities
+    V2_0: true
+
+################################################################################
+# SECTION: Organizations
+################################################################################
+Organizations:
+
+  - &OrdererOrg
+    Name: OrdererMSP
+    ID: OrdererMSP
+    MSPDir: ../crypto-config/ordererOrganizations/university.com/msp
+    Policies:
+      Readers:
+        Type: Signature
+        Rule: "OR('OrdererMSP.member')"
+      Writers:
+        Type: Signature
+        Rule: "OR('OrdererMSP.member')"
+      Admins:
+        Type: Signature
+        Rule: "OR('OrdererMSP.admin')"
+
+  - &UniversityAdminOrg
+    Name: UniversityAdminMSP
+    ID: UniversityAdminMSP
+    MSPDir: ../crypto-config/peerOrganizations/admin.university.com/msp
+    Policies:
+      Readers:
+        Type: Signature
+        Rule: "OR('UniversityAdminMSP.admin', 'UniversityAdminMSP.peer', 'UniversityAdminMSP.client')"
+      Writers:
+        Type: Signature
+        Rule: "OR('UniversityAdminMSP.admin', 'UniversityAdminMSP.client')"
+      Admins:
+        Type: Signature
+        Rule: "OR('UniversityAdminMSP.admin')"
+      Endorsement:
+        Type: Signature
+        Rule: "OR('UniversityAdminMSP.peer')"
+    AnchorPeers:
+      - Host: peer0.admin.university.com
+        Port: 7051
+
+  - &FinanceOrg
+    Name: FinanceMSP
+    ID: FinanceMSP
+    MSPDir: ../crypto-config/peerOrganizations/finance.university.com/msp
+    Policies:
+      Readers:
+        Type: Signature
+        Rule: "OR('FinanceMSP.admin', 'FinanceMSP.peer', 'FinanceMSP.client')"
+      Writers:
+        Type: Signature
+        Rule: "OR('FinanceMSP.admin', 'FinanceMSP.client')"
+      Admins:
+        Type: Signature
+        Rule: "OR('FinanceMSP.admin')"
+      Endorsement:
+        Type: Signature
+        Rule: "OR('FinanceMSP.peer')"
+    AnchorPeers:
+      - Host: peer0.finance.university.com
+        Port: 8051
+
+  - &SecurityOrg
+    Name: SecurityMSP
+    ID: SecurityMSP
+    MSPDir: ../crypto-config/peerOrganizations/security.university.com/msp
+    Policies:
+      Readers:
+        Type: Signature
+        Rule: "OR('SecurityMSP.admin', 'SecurityMSP.peer', 'SecurityMSP.client')"
+      Writers:
+        Type: Signature
+        Rule: "OR('SecurityMSP.admin', 'SecurityMSP.client')"
+      Admins:
+        Type: Signature
+        Rule: "OR('SecurityMSP.admin')"
+      Endorsement:
+        Type: Signature
+        Rule: "OR('SecurityMSP.peer')"
+    AnchorPeers:
+      - Host: peer0.security.university.com
+        Port: 9051
+
+  - &StudentAffairsOrg
+    Name: StudentAffairsMSP
+    ID: StudentAffairsMSP
+    MSPDir: ../crypto-config/peerOrganizations/studentaffairs.university.com/msp
+    Policies:
+      Readers:
+        Type: Signature
+        Rule: "OR('StudentAffairsMSP.admin', 'StudentAffairsMSP.peer', 'StudentAffairsMSP.client')"
+      Writers:
+        Type: Signature
+        Rule: "OR('StudentAffairsMSP.admin', 'StudentAffairsMSP.client')"
+      Admins:
+        Type: Signature
+        Rule: "OR('StudentAffairsMSP.admin')"
+      Endorsement:
+        Type: Signature
+        Rule: "OR('StudentAffairsMSP.peer')"
+    AnchorPeers:
+      - Host: peer0.studentaffairs.university.com
+        Port: 10051
+
+################################################################################
+# SECTION: Orderer
+################################################################################
+Orderer: &OrdererDefaults
+  OrdererType: etcdraft
+
+  Addresses:
+    - orderer0.university.com:7050
+    - orderer1.university.com:7050
+    - orderer2.university.com:7050
+
+  EtcdRaft:
+    Consenters:
+      - Host: orderer0.university.com
+        Port: 7050
+        ClientTLSCert: ../crypto-config/ordererOrganizations/university.com/orderers/orderer0.university.com/tls/server.crt
+        ServerTLSCert: ../crypto-config/ordererOrganizations/university.com/orderers/orderer0.university.com/tls/server.crt
+      - Host: orderer1.university.com
+        Port: 7050
+        ClientTLSCert: ../crypto-config/ordererOrganizations/university.com/orderers/orderer1.university.com/tls/server.crt
+        ServerTLSCert: ../crypto-config/ordererOrganizations/university.com/orderers/orderer1.university.com/tls/server.crt
+      - Host: orderer2.university.com
+        Port: 7050
+        ClientTLSCert: ../crypto-config/ordererOrganizations/university.com/orderers/orderer2.university.com/tls/server.crt
+        ServerTLSCert: ../crypto-config/ordererOrganizations/university.com/orderers/orderer2.university.com/tls/server.crt
+
+  BatchTimeout: 2s
+  BatchSize:
+    MaxMessageCount: 10
+    AbsoluteMaxBytes: 99 MB
+    PreferredMaxBytes: 512 KB
+
+  Policies:
+    Readers:
+      Type: ImplicitMeta
+      Rule: "ANY Readers"
+    Writers:
+      Type: ImplicitMeta
+      Rule: "ANY Writers"
+    Admins:
+      Type: ImplicitMeta
+      Rule: "MAJORITY Admins"
+    BlockValidation:
+      Type: ImplicitMeta
+      Rule: "ANY Writers"
+
+  Capabilities:
+    <<: *OrdererCapabilities
+
+################################################################################
+# SECTION: Application
+################################################################################
+Application: &ApplicationDefaults
+  Organizations:
+
+  Policies:
+    Readers:
+      Type: ImplicitMeta
+      Rule: "ANY Readers"
+    Writers:
+      Type: ImplicitMeta
+      Rule: "ANY Writers"
+    Admins:
+      Type: ImplicitMeta
+      Rule: "MAJORITY Admins"
+    LifecycleEndorsement:
+      Type: ImplicitMeta
+      Rule: "MAJORITY Endorsement"
+    Endorsement:
+      Type: ImplicitMeta
+      Rule: "MAJORITY Endorsement"
+
+  Capabilities:
+    <<: *ApplicationCapabilities
+
+################################################################################
+# SECTION: Channel
+################################################################################
+Channel: &ChannelDefaults
+  Policies:
+    Readers:
+      Type: ImplicitMeta
+      Rule: "ANY Readers"
+    Writers:
+      Type: ImplicitMeta
+      Rule: "ANY Writers"
+    Admins:
+      Type: ImplicitMeta
+      Rule: "MAJORITY Admins"
+
+  Capabilities:
+    <<: *ChannelCapabilities
+
+################################################################################
+# SECTION: Profiles
+################################################################################
+Profiles:
+
+  # Genesis block for the orderer system channel
+  CPPMSOrdererGenesis:
+    <<: *ChannelDefaults
+    Orderer:
+      <<: *OrdererDefaults
+      Organizations:
+        - *OrdererOrg
+    Consortiums:
+      ParkingConsortium:
+        Organizations:
+          - *UniversityAdminOrg
+          - *FinanceOrg
+          - *SecurityOrg
+          - *StudentAffairsOrg
+
+  # parking-main-channel: UniversityAdmin + Security + StudentAffairs
+  # Used for permit issuance, gate verification, and eligibility management
+  ParkingMainChannel:
+    <<: *ChannelDefaults
+    Consortium: ParkingConsortium
+    Application:
+      <<: *ApplicationDefaults
+      Organizations:
+        - *UniversityAdminOrg
+        - *SecurityOrg
+        - *StudentAffairsOrg
+
+  # finance-channel: UniversityAdmin + Finance
+  # Used for fee payments and financial verification (isolated from Security/StudentAffairs)
+  FinanceChannel:
+    <<: *ChannelDefaults
+    Consortium: ParkingConsortium
+    Application:
+      <<: *ApplicationDefaults
+      Organizations:
+        - *UniversityAdminOrg
+        - *FinanceOrg

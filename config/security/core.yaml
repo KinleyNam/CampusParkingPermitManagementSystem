@@ -67,7 +67,7 @@ peer:
       enabled: false
 
   tls:
-    enabled: false
+    enabled: true
     clientAuthRequired: false
     cert:
       file: /var/hyperledger/tls/server.crt

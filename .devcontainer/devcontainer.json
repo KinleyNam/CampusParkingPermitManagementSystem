@@ -1,11 +1,11 @@
 {
-  "name": "Campus Parking Management System - HLF Dev",
-  "dockerComposeFile": ["docker-compose-cppms.yml"],
-  "service": "development",
-  "workspaceFolder": "/workspaces/CPPMS",
+  "name": "CPPMS - HLF Dev",
+  "image": "mcr.microsoft.com/devcontainers/base:ubuntu",
   "features": {
-    "ghcr.io/devcontainers/features/docker-outside-of-docker:1": {}
+    "ghcr.io/devcontainers/features/docker-in-docker:2": {},
+    "ghcr.io/devcontainers/features/git:1": {}
   },
+  "postCreateCommand": "mkdir -p $HOME/fabric && cd $HOME/fabric && curl -sSL https://raw.githubusercontent.com/hyperledger/fabric/main/scripts/install-fabric.sh | bash -s -- binary && echo 'export PATH=$PATH:$HOME/fabric/bin' >> ~/.bashrc",
   "customizations": {
     "vscode": {
       "extensions": [
@@ -13,5 +13,6 @@
         "ms-azuretools.vscode-docker"
       ]
     }
-  }
+  },
+  "remoteUser": "vscode"
 }

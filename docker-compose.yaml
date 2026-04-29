@@ -41,7 +41,7 @@ services:
   ##############################################################################
 
   orderer0.university.com:
-    image: hyperledger/fabric-orderer:latest
+    image: hyperledger/fabric-orderer:2.5
     container_name: orderer0.university.com
     environment:
       - FABRIC_LOGGING_SPEC=INFO
@@ -64,7 +64,7 @@ services:
     command: orderer
 
   orderer1.university.com:
-    image: hyperledger/fabric-orderer:latest
+    image: hyperledger/fabric-orderer:2.5
     container_name: orderer1.university.com
     environment:
       - FABRIC_LOGGING_SPEC=INFO
@@ -89,7 +89,7 @@ services:
       - orderer0.university.com
 
   orderer2.university.com:
-    image: hyperledger/fabric-orderer:latest
+    image: hyperledger/fabric-orderer:2.5
     container_name: orderer2.university.com
     environment:
       - FABRIC_LOGGING_SPEC=INFO
@@ -118,7 +118,7 @@ services:
   ##############################################################################
 
   peer0.admin.university.com:
-    image: hyperledger/fabric-peer:latest
+    image: hyperledger/fabric-peer:2.5
     container_name: peer0.admin.university.com
     environment:
       - FABRIC_LOGGING_SPEC=INFO
@@ -151,7 +151,7 @@ services:
       - orderer0.university.com
 
   peer1.admin.university.com:
-    image: hyperledger/fabric-peer:latest
+    image: hyperledger/fabric-peer:2.5
     container_name: peer1.admin.university.com
     environment:
       - FABRIC_LOGGING_SPEC=INFO
@@ -188,7 +188,7 @@ services:
   ##############################################################################
 
   peer0.finance.university.com:
-    image: hyperledger/fabric-peer:latest
+    image: hyperledger/fabric-peer:2.5
     container_name: peer0.finance.university.com
     environment:
       - FABRIC_LOGGING_SPEC=INFO
@@ -221,7 +221,7 @@ services:
       - orderer0.university.com
 
   peer1.finance.university.com:
-    image: hyperledger/fabric-peer:latest
+    image: hyperledger/fabric-peer:2.5
     container_name: peer1.finance.university.com
     environment:
       - FABRIC_LOGGING_SPEC=INFO
@@ -258,7 +258,7 @@ services:
   ##############################################################################
 
   peer0.security.university.com:
-    image: hyperledger/fabric-peer:latest
+    image: hyperledger/fabric-peer:2.5
     container_name: peer0.security.university.com
     environment:
       - FABRIC_LOGGING_SPEC=INFO
@@ -291,7 +291,7 @@ services:
       - orderer0.university.com
 
   peer1.security.university.com:
-    image: hyperledger/fabric-peer:latest
+    image: hyperledger/fabric-peer:2.5
     container_name: peer1.security.university.com
     environment:
       - FABRIC_LOGGING_SPEC=INFO
@@ -328,7 +328,7 @@ services:
   ##############################################################################
 
   peer0.studentaffairs.university.com:
-    image: hyperledger/fabric-peer:latest
+    image: hyperledger/fabric-peer:2.5
     container_name: peer0.studentaffairs.university.com
     environment:
       - FABRIC_LOGGING_SPEC=INFO
@@ -361,7 +361,7 @@ services:
       - orderer0.university.com
 
   peer1.studentaffairs.university.com:
-    image: hyperledger/fabric-peer:latest
+    image: hyperledger/fabric-peer:2.5
     container_name: peer1.studentaffairs.university.com
     environment:
       - FABRIC_LOGGING_SPEC=INFO

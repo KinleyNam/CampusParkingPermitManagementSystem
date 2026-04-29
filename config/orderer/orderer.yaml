@@ -8,7 +8,7 @@ General:
   ListenAddress: 0.0.0.0
   ListenPort: 7050
   TLS:
-    Enabled: false
+    Enabled: true
     PrivateKey: /var/hyperledger/tls/server.key
     Certificate: /var/hyperledger/tls/server.crt
     RootCAs:

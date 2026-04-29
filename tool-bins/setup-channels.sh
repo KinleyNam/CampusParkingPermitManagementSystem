@@ -3,7 +3,6 @@
 # setup-channels.sh
 # Campus Parking Management System
 # Creates channels and joins all relevant peers
-# Run from inside the devcontainer at /workspaces/CPPMS
 ################################################################################
 
 set -e
@@ -16,11 +15,10 @@ echo "============================================================"
 echo " Campus Parking Management System - Channel Setup"
 echo "============================================================"
 
-sleep 5  # Give orderers time to fully start
+sleep 5
 
 ##############################################################################
 # CHANNEL 1: parking-main-channel
-# Members: UniversityAdmin + Security + StudentAffairs
 ##############################################################################
 
 echo ""
@@ -30,7 +28,8 @@ peer channel create \
   -o "$ORDERER_ADDRESS" \
   -c parking-main-channel \
   -f "$ARTIFACTS_DIR/parking-main-channel/parking-main-channel.tx" \
-  --outputBlock "$ARTIFACTS_DIR/parking-main-channel/parking-main-channel.block"
+  --outputBlock "$ARTIFACTS_DIR/parking-main-channel/parking-main-channel.block" \
+  --tls --cafile "$ORDERER_CA"
 
 echo "[parking-main-channel] Joining peer0.admin..."
 peer channel join -b "$ARTIFACTS_DIR/parking-main-channel/parking-main-channel.block"
@@ -55,32 +54,32 @@ echo "[parking-main-channel] Joining peer1.studentaffairs..."
 source "$SCRIPT_DIR/set_peer_env.sh" studentaffairs 1
 peer channel join -b "$ARTIFACTS_DIR/parking-main-channel/parking-main-channel.block"
 
-# Update anchor peers for parking-main-channel
 echo "[parking-main-channel] Updating anchor peers..."
-
 source "$SCRIPT_DIR/set_peer_env.sh" admin 0
 peer channel update \
   -o "$ORDERER_ADDRESS" \
   -c parking-main-channel \
-  -f "$ARTIFACTS_DIR/parking-main-channel/UniversityAdminMSP-anchors.tx"
+  -f "$ARTIFACTS_DIR/parking-main-channel/UniversityAdminMSP-anchors.tx" \
+  --tls --cafile "$ORDERER_CA"
 
 source "$SCRIPT_DIR/set_peer_env.sh" security 0
 peer channel update \
   -o "$ORDERER_ADDRESS" \
   -c parking-main-channel \
-  -f "$ARTIFACTS_DIR/parking-main-channel/SecurityMSP-anchors.tx"
+  -f "$ARTIFACTS_DIR/parking-main-channel/SecurityMSP-anchors.tx" \
+  --tls --cafile "$ORDERER_CA"
 
 source "$SCRIPT_DIR/set_peer_env.sh" studentaffairs 0
 peer channel update \
   -o "$ORDERER_ADDRESS" \
   -c parking-main-channel \
-  -f "$ARTIFACTS_DIR/parking-main-channel/StudentAffairsMSP-anchors.tx"
+  -f "$ARTIFACTS_DIR/parking-main-channel/StudentAffairsMSP-anchors.tx" \
+  --tls --cafile "$ORDERER_CA"
 
-echo "[parking-main-channel] Setup complete."
+echo "[parking-main-channel] Done."
 
 ##############################################################################
 # CHANNEL 2: finance-channel
-# Members: UniversityAdmin + Finance
 ##############################################################################
 
 echo ""
@@ -90,7 +89,8 @@ peer channel create \
   -o "$ORDERER_ADDRESS" \
   -c finance-channel \
   -f "$ARTIFACTS_DIR/finance-channel/finance-channel.tx" \
-  --outputBlock "$ARTIFACTS_DIR/finance-channel/finance-channel.block"
+  --outputBlock "$ARTIFACTS_DIR/finance-channel/finance-channel.block" \
+  --tls --cafile "$ORDERER_CA"
 
 echo "[finance-channel] Joining peer0.admin..."
 peer channel join -b "$ARTIFACTS_DIR/finance-channel/finance-channel.block"
@@ -107,28 +107,28 @@ echo "[finance-channel] Joining peer1.finance..."
 source "$SCRIPT_DIR/set_peer_env.sh" finance 1
 peer channel join -b "$ARTIFACTS_DIR/finance-channel/finance-channel.block"
 
-# Update anchor peers for finance-channel
 echo "[finance-channel] Updating anchor peers..."
-
 source "$SCRIPT_DIR/set_peer_env.sh" admin 0
 peer channel update \
   -o "$ORDERER_ADDRESS" \
   -c finance-channel \
-  -f "$ARTIFACTS_DIR/finance-channel/UniversityAdminMSP-anchors.tx"
+  -f "$ARTIFACTS_DIR/finance-channel/UniversityAdminMSP-anchors.tx" \
+  --tls --cafile "$ORDERER_CA"
 
 source "$SCRIPT_DIR/set_peer_env.sh" finance 0
 peer channel update \
   -o "$ORDERER_ADDRESS" \
   -c finance-channel \
-  -f "$ARTIFACTS_DIR/finance-channel/FinanceMSP-anchors.tx"
+  -f "$ARTIFACTS_DIR/finance-channel/FinanceMSP-anchors.tx" \
+  --tls --cafile "$ORDERER_CA"
 
-echo "[finance-channel] Setup complete."
+echo "[finance-channel] Done."
 
 echo ""
 echo "============================================================"
 echo " All channels created and peers joined successfully!"
 echo "============================================================"
 echo ""
-echo "Verify channel membership with:"
+echo "Verify with:"
 echo "  source ./tool-bins/set_peer_env.sh admin 0"
 echo "  peer channel list"

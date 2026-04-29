@@ -10,7 +10,7 @@ PEER_NUM=${2:-0}
 WORKSPACE=/workspaces/CampusParkingPermitManagementSystem
 CRYPTO=$WORKSPACE/crypto-config
 
-export ORDERER_CA=$CRYPTO/ordererOrganizations/university.com/tlsca/tlsca.university.com-cert.pem
+export ORDERER_CA=$CRYPTO/ordererOrganizations/university.com/orderers/orderer0.university.com/tls/ca.crt
 export ORDERER_ADDRESS=orderer0.university.com:7050
 export CORE_PEER_TLS_ENABLED=true
 export FABRIC_LOGGING_SPEC=INFO

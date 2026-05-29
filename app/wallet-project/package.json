@@ -1,0 +1,13 @@
+{
+  "name": "cppms-wallet",
+  "version": "1.0.0",
+  "description": "Wallet setup for CPPMS Fabric identities",
+  "main": "wallet.js",
+  "scripts": {
+    "setup": "node wallet.js"
+  },
+  "dependencies": {
+    "fabric-network": "^2.2.20",
+    "fabric-ca-client": "^2.2.20"
+  }
+}

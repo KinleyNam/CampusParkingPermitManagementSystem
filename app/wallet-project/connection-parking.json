@@ -1,0 +1,94 @@
+{
+  "name": "cppms-parking-main-channel",
+  "version": "1.0.0",
+  "client": {
+    "organization": "UniversityAdmin",
+    "connection": { "timeout": { "peer": { "endorser": "300" } } }
+  },
+  "organizations": {
+    "UniversityAdmin": {
+      "mspid": "UniversityAdminMSP",
+      "peers": ["peer0.admin.university.com", "peer1.admin.university.com"],
+      "certificateAuthorities": ["ca.admin.university.com"]
+    },
+    "Security": {
+      "mspid": "SecurityMSP",
+      "peers": ["peer0.security.university.com", "peer1.security.university.com"],
+      "certificateAuthorities": ["ca.security.university.com"]
+    },
+    "StudentAffairs": {
+      "mspid": "StudentAffairsMSP",
+      "peers": ["peer0.studentaffairs.university.com", "peer1.studentaffairs.university.com"],
+      "certificateAuthorities": ["ca.studentaffairs.university.com"]
+    }
+  },
+  "peers": {
+    "peer0.admin.university.com": {
+      "url": "grpcs://peer0.admin.university.com:7051",
+      "tlsCACerts": { "path": "../../crypto-config/peerOrganizations/admin.university.com/tlsca/tlsca.admin.university.com-cert.pem" },
+      "grpcOptions": { "ssl-target-name-override": "peer0.admin.university.com", "hostnameOverride": "peer0.admin.university.com" }
+    },
+    "peer1.admin.university.com": {
+      "url": "grpcs://peer1.admin.university.com:7055",
+      "tlsCACerts": { "path": "../../crypto-config/peerOrganizations/admin.university.com/tlsca/tlsca.admin.university.com-cert.pem" },
+      "grpcOptions": { "ssl-target-name-override": "peer1.admin.university.com", "hostnameOverride": "peer1.admin.university.com" }
+    },
+    "peer0.security.university.com": {
+      "url": "grpcs://peer0.security.university.com:9051",
+      "tlsCACerts": { "path": "../../crypto-config/peerOrganizations/security.university.com/tlsca/tlsca.security.university.com-cert.pem" },
+      "grpcOptions": { "ssl-target-name-override": "peer0.security.university.com", "hostnameOverride": "peer0.security.university.com" }
+    },
+    "peer1.security.university.com": {
+      "url": "grpcs://peer1.security.university.com:9055",
+      "tlsCACerts": { "path": "../../crypto-config/peerOrganizations/security.university.com/tlsca/tlsca.security.university.com-cert.pem" },
+      "grpcOptions": { "ssl-target-name-override": "peer1.security.university.com", "hostnameOverride": "peer1.security.university.com" }
+    },
+    "peer0.studentaffairs.university.com": {
+      "url": "grpcs://peer0.studentaffairs.university.com:10051",
+      "tlsCACerts": { "path": "../../crypto-config/peerOrganizations/studentaffairs.university.com/tlsca/tlsca.studentaffairs.university.com-cert.pem" },
+      "grpcOptions": { "ssl-target-name-override": "peer0.studentaffairs.university.com", "hostnameOverride": "peer0.studentaffairs.university.com" }
+    },
+    "peer1.studentaffairs.university.com": {
+      "url": "grpcs://peer1.studentaffairs.university.com:10055",
+      "tlsCACerts": { "path": "../../crypto-config/peerOrganizations/studentaffairs.university.com/tlsca/tlsca.studentaffairs.university.com-cert.pem" },
+      "grpcOptions": { "ssl-target-name-override": "peer1.studentaffairs.university.com", "hostnameOverride": "peer1.studentaffairs.university.com" }
+    }
+  },
+  "certificateAuthorities": {
+    "ca.admin.university.com": {
+      "url": "https://ca.admin.university.com:7054",
+      "caName": "ca-admin",
+      "tlsCACerts": { "path": "../../crypto-config/peerOrganizations/admin.university.com/ca/ca.admin.university.com-cert.pem" },
+      "httpOptions": { "verify": false }
+    },
+    "ca.security.university.com": {
+      "url": "https://ca.security.university.com:9054",
+      "caName": "ca-security",
+      "tlsCACerts": { "path": "../../crypto-config/peerOrganizations/security.university.com/ca/ca.security.university.com-cert.pem" },
+      "httpOptions": { "verify": false }
+    },
+    "ca.studentaffairs.university.com": {
+      "url": "https://ca.studentaffairs.university.com:10054",
+      "caName": "ca-studentaffairs",
+      "tlsCACerts": { "path": "../../crypto-config/peerOrganizations/studentaffairs.university.com/ca/ca.studentaffairs.university.com-cert.pem" },
+      "httpOptions": { "verify": false }
+    }
+  },
+  "orderers": {
+    "orderer0.university.com": {
+      "url": "grpcs://orderer0.university.com:7050",
+      "tlsCACerts": { "path": "../../crypto-config/ordererOrganizations/university.com/orderers/orderer0.university.com/tls/ca.crt" },
+      "grpcOptions": { "ssl-target-name-override": "orderer0.university.com" }
+    }
+  },
+  "channels": {
+    "parking-main-channel": {
+      "orderers": ["orderer0.university.com"],
+      "peers": {
+        "peer0.admin.university.com": { "endorsingPeer": true, "chaincodeQuery": true, "ledgerQuery": true, "eventSource": true },
+        "peer0.security.university.com": { "endorsingPeer": true, "chaincodeQuery": true, "ledgerQuery": true, "eventSource": false },
+        "peer0.studentaffairs.university.com": { "endorsingPeer": true, "chaincodeQuery": true, "ledgerQuery": true, "eventSource": false }
+      }
+    }
+  }
+}

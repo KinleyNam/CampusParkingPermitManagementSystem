@@ -14,3 +14,6 @@ channel-artifacts/finance-channel/*.tx
 # OS
 .DS_Store
 Thumbs.db
+
+# Claude
+.claude

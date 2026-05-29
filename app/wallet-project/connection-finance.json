@@ -1,0 +1,72 @@
+{
+  "name": "cppms-finance-channel",
+  "version": "1.0.0",
+  "client": {
+    "organization": "UniversityAdmin",
+    "connection": { "timeout": { "peer": { "endorser": "300" } } }
+  },
+  "organizations": {
+    "UniversityAdmin": {
+      "mspid": "UniversityAdminMSP",
+      "peers": ["peer0.admin.university.com", "peer1.admin.university.com"],
+      "certificateAuthorities": ["ca.admin.university.com"]
+    },
+    "Finance": {
+      "mspid": "FinanceMSP",
+      "peers": ["peer0.finance.university.com", "peer1.finance.university.com"],
+      "certificateAuthorities": ["ca.finance.university.com"]
+    }
+  },
+  "peers": {
+    "peer0.admin.university.com": {
+      "url": "grpcs://peer0.admin.university.com:7051",
+      "tlsCACerts": { "path": "../../crypto-config/peerOrganizations/admin.university.com/tlsca/tlsca.admin.university.com-cert.pem" },
+      "grpcOptions": { "ssl-target-name-override": "peer0.admin.university.com", "hostnameOverride": "peer0.admin.university.com" }
+    },
+    "peer1.admin.university.com": {
+      "url": "grpcs://peer1.admin.university.com:7055",
+      "tlsCACerts": { "path": "../../crypto-config/peerOrganizations/admin.university.com/tlsca/tlsca.admin.university.com-cert.pem" },
+      "grpcOptions": { "ssl-target-name-override": "peer1.admin.university.com", "hostnameOverride": "peer1.admin.university.com" }
+    },
+    "peer0.finance.university.com": {
+      "url": "grpcs://peer0.finance.university.com:8051",
+      "tlsCACerts": { "path": "../../crypto-config/peerOrganizations/finance.university.com/tlsca/tlsca.finance.university.com-cert.pem" },
+      "grpcOptions": { "ssl-target-name-override": "peer0.finance.university.com", "hostnameOverride": "peer0.finance.university.com" }
+    },
+    "peer1.finance.university.com": {
+      "url": "grpcs://peer1.finance.university.com:8055",
+      "tlsCACerts": { "path": "../../crypto-config/peerOrganizations/finance.university.com/tlsca/tlsca.finance.university.com-cert.pem" },
+      "grpcOptions": { "ssl-target-name-override": "peer1.finance.university.com", "hostnameOverride": "peer1.finance.university.com" }
+    }
+  },
+  "certificateAuthorities": {
+    "ca.admin.university.com": {
+      "url": "https://ca.admin.university.com:7054",
+      "caName": "ca-admin",
+      "tlsCACerts": { "path": "../../crypto-config/peerOrganizations/admin.university.com/ca/ca.admin.university.com-cert.pem" },
+      "httpOptions": { "verify": false }
+    },
+    "ca.finance.university.com": {
+      "url": "https://ca.finance.university.com:8054",
+      "caName": "ca-finance",
+      "tlsCACerts": { "path": "../../crypto-config/peerOrganizations/finance.university.com/ca/ca.finance.university.com-cert.pem" },
+      "httpOptions": { "verify": false }
+    }
+  },
+  "orderers": {
+    "orderer0.university.com": {
+      "url": "grpcs://orderer0.university.com:7050",
+      "tlsCACerts": { "path": "../../crypto-config/ordererOrganizations/university.com/orderers/orderer0.university.com/tls/ca.crt" },
+      "grpcOptions": { "ssl-target-name-override": "orderer0.university.com" }
+    }
+  },
+  "channels": {
+    "finance-channel": {
+      "orderers": ["orderer0.university.com"],
+      "peers": {
+        "peer0.admin.university.com": { "endorsingPeer": true, "chaincodeQuery": true, "ledgerQuery": true, "eventSource": true },
+        "peer0.finance.university.com": { "endorsingPeer": true, "chaincodeQuery": true, "ledgerQuery": true, "eventSource": false }
+      }
+    }
+  }
+}
